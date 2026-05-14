@@ -4,3 +4,26 @@
     font-family: 'JetBrains Mono', monospace;
 }
 
+.correct{
+    color: rgb(22, 127, 22);
+}
+
+.incorrect{
+    color: red;
+    text-decoration: underline;
+}
+
+.pending{
+    color: gray;
+}
+
+span{
+    font-size: 2rem;
+}
+
+.hidden{
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s linear, visibility 0s 0.5s;
+}
