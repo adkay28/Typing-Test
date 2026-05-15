@@ -4,23 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing Test</title>
+    <!-- Your Font -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Typing Test</h1>
-    <div id="btn">
-        <span>
-            <p>Select Number of Words: </p>
-        </span>
-        <button id="thirty" class="speed">30</button>
-        <button id="sixty" class="speed">60</button>
-        <button id="ninety" class="speed">90</button>
+    
+    <div class="top">
+        <a href="https://github.com/adkay28">Github</a>
+
     </div>
 
-    <div id="text">
-        
-    </div>
+    <header>
+        <h1>Typing Test</h1>
+    </header>
 
+    <main>
+        <div id="btn" class="controls">
+            <span>Select Number of Words: </span>
+            <button type="button" id="thirty" class="speed-btn">30</button>
+            <button type="button" id="sixty" class="speed-btn">60</button>
+            <button type="button" id="ninety" class="speed-btn">90</button>
+        </div>
+
+        <div id="text" class="text-container">
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="progress-container hidden">
+            <div class="progress-bar" style="width: 0%"></div>
+        </div>
+    </footer>
+    <div class="bottom hidden">
+        <p>Press Option+R / Alt+R to restart</p>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="app.js"></script>
 </body>

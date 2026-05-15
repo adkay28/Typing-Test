@@ -1,12 +1,27 @@
 let btn1 = document.querySelector("#thirty");
 let btn2 = document.querySelector("#sixty");
 let btn3 = document.querySelector("#ninety");
-let url = "https://random-word-api.herokuapp.com/word?number=";
+let url = "https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-no-swears.txt";
+let typing = false;
+let gameEndFlag = false;
+let firstPress = false;
+let userArr = [];
+let actualArr = [];
+let startTime, endTime;
+let idx = 0;    //char at actualArr[idx] will be matched to user input
+let spanList;
 
 async function getText(val){
     try {
-        let res = await axios.get(url+val);
-        return res.data;
+        let res = await axios.get(url);
+        let allWords = res.data.split("\n"); 
+        let wordsArray = [];
+        let numWords = parseInt(val);
+        for(let i = 0; i < numWords; i++) {
+            let randomIndex = Math.floor(Math.random() * allWords.length);
+            wordsArray.push(allWords[randomIndex]);
+        }
+        return wordsArray;
         // Temporarily bypassing API
         // return ["this", "is", "a", "temporary", "test", "array"];
     } catch(err){
@@ -14,8 +29,6 @@ async function getText(val){
         return [];
     }
 }
-
-let typing = false;
 
 btn1.addEventListener("click", async ()=>{
     let text = await getText("30");
@@ -25,6 +38,11 @@ btn1.addEventListener("click", async ()=>{
         div1.classList.add("hidden");
         let h1 = document.querySelector("h1");
         h1.classList.add("hidden");
+        let pb = document.querySelector(".progress-container");
+        console.log(pb.classList);
+        pb.classList.remove("hidden");
+        let bottom = document.querySelector(".bottom");
+        bottom.classList.remove("hidden");
         print(text);
     }
 })
@@ -36,6 +54,10 @@ btn2.addEventListener("click", async ()=>{
         div1.classList.add("hidden");
         let h1 = document.querySelector("h1");
         h1.classList.add("hidden");
+        let pb = document.querySelector(".progress-container");
+        pb.classList.remove("hidden");
+        let bottom = document.querySelector(".bottom");
+        bottom.classList.remove("hidden");
         print(text);
     }
 })
@@ -47,14 +69,17 @@ btn3.addEventListener("click", async ()=>{
         div1.classList.add("hidden");
         let h1 = document.querySelector("h1");
         h1.classList.add("hidden");
+        let pb = document.querySelector(".progress-container");
+        pb.classList.remove("hidden");
+        let bottom = document.querySelector(".bottom");
+        bottom.classList.remove("hidden");
         print(text);
     }
 })
 
-let actualArr = [];
-let spanList;
 
 function print(text){//to print text onto screen and make a char array
+    gameEndFlag = false;
     let passText = [];
     let cnt = 0;
     for(let word of text){
@@ -79,27 +104,32 @@ function print(text){//to print text onto screen and make a char array
         outer.appendChild(span);
     }
     spanList = document.querySelectorAll("#text span");
+    spanList[0].classList.add("cursor");
     console.log(spanList);
 }
-
-let userArr = [];
-let firstPress = false;
-let startTime, endTime;
-let idx = 0;    //char at actualArr[idx] will be matched to user input
 
 addEventListener("keydown", match);
 
 function match(e){
+    console.log(e);
 
+    //keybind to restart the game
+    if ((e.code === "KeyR") && (e.altKey)){
+        e.preventDefault();
+        console.log("Restart triggered!");
+        restart();
+        return;
+    }
+    
     if(!typing){
         return;
     }
-
     //detect first key press
     if(!firstPress){
         firstPress = true;
         startTime = Date.now();
     }
+
     if(e.key.length === 1){//valid char
         userArr.push(e.key);
         if(userArr.at(-1) == actualArr[idx]){//char match
@@ -116,12 +146,18 @@ function match(e){
                 spanList[idx].classList.add("incorrect");
             }
         }
+        spanList[idx].classList.remove("cursor");
         idx++;
-        if(idx < spanList.length) spanList[idx].classList.add("pending");
+        if(idx < spanList.length){
+            spanList[idx].classList.add("pending");
+            spanList[idx].classList.add("cursor");
+        }
     }
     if(e.keyCode == 8){ //backspace
         if(userArr.length > 0){
+            spanList[idx].classList.remove("cursor");
             idx--;
+            spanList[idx].classList.add("cursor");
             spanList[idx].classList.remove("correct");
             spanList[idx].classList.remove("incorrect");
             spanList[idx].classList.add("pending");
@@ -131,20 +167,34 @@ function match(e){
             userArr.pop();
         }
     }
+
+    //update progress bar
+    let per = (userArr.length/actualArr.length)*100;
+    let perc = Math.round(per);
+    let innerBar = document.querySelector(".progress-bar");
+    innerBar.style.width = perc + "%";
     if(idx == actualArr.length)  gameEnd();
 }
 
 function gameEnd(){
+    gameEndFlag = true;
     endTime = Date.now();
     typing = false;
     idx = 0;
     let error = 0;
+    let pb = document.querySelector(".progress-container");
+    pb.classList.add("hidden");
     let div1 = document.querySelector("#btn");
     div1.classList.remove("hidden");
     let h1 = document.querySelector("h1");
     h1.classList.remove("hidden");
     let outer = document.querySelector("#text");
     outer.innerText = "";
+    let innerBar = document.querySelector(".progress-bar");
+    innerBar.style.width = "0%";
+    let bottom = document.querySelector(".bottom");
+    bottom.classList.add("hidden");
+
     let p = document.createElement("p");
     let p2 = document.createElement("p");
     let p3 = document.createElement("p");
@@ -175,4 +225,26 @@ function gameEnd(){
     userArr = [];
     spanList = [];
     firstPress = false;
+}
+
+function restart(){
+    idx = 0;
+    userArr = [];
+    actualArr = [];
+    firstPress = false;
+    typing = false;
+    gameEndFlag = false;
+
+    let pb = document.querySelector(".progress-container");
+    pb.classList.add("hidden");
+    let div1 = document.querySelector("#btn");
+    div1.classList.remove("hidden");
+    let outer = document.querySelector("#text");
+    outer.innerText = "";
+    let h1 = document.querySelector("h1");
+    h1.classList.remove("hidden");
+    let innerBar = document.querySelector(".progress-bar");
+    innerBar.style.width = "0%";
+    let bottom = document.querySelector(".bottom");
+    bottom.classList.add("hidden");
 }
